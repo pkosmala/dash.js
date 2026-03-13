@@ -65,7 +65,8 @@ function StreamController() {
         autoPlay, isStreamSwitchingInProgress, hasMediaError, hasInitialisationError, mediaSource, videoModel,
         playbackController, serviceDescriptionController, mediaPlayerModel, customParametersModel, isPaused,
         initialPlayback, initialSteeringRequest, playbackEndedTimerInterval, preloadingStreams, settings,
-        firstLicenseIsFetched, waitForPlaybackStartTimeout, providedStartTime, errorInformation;
+        firstLicenseIsFetched, waitForPlaybackStartTimeout, providedStartTime, errorInformation,
+        mediaSourcePreOpenUrl;
 
     function setup() {
         logger = Debug(context).getInstance().getLogger(instance);
@@ -197,6 +198,18 @@ function StreamController() {
     function load(url, startTime = NaN) {
         _checkConfig();
         providedStartTime = startTime;
+
+        // Pre-open the MediaSource in parallel with the manifest fetch to hide the
+        // sourceopen latency. On some HbbTV devices (e.g. Sony 2022) the browser can
+        // take several seconds to fire sourceopen after video.src is set. In dash.js 4.x
+        // this happened concurrently with the manifest download; moving it here restores
+        // that parallelism.
+        if (videoModel.getElement() && !mediaSource) {
+            mediaSource = mediaSourceController.createMediaSource();
+            mediaSourcePreOpenUrl = mediaSourceController.attachMediaSource(videoModel);
+            logger.debug('Pre-opening MediaSource in parallel with manifest fetch');
+        }
+
         manifestLoader.load(url);
     }
 
@@ -519,6 +532,19 @@ function StreamController() {
         if (!mediaSource) {
             mediaSource = mediaSourceController.createMediaSource();
             _open();
+        } else if (mediaSourcePreOpenUrl) {
+            // MediaSource was pre-opened in load() in parallel with the manifest fetch.
+            // Reuse it: the objectURL is already set as video.src, we just need to
+            // wait for (or act on) sourceopen.
+            sourceUrl = mediaSourcePreOpenUrl;
+            mediaSourcePreOpenUrl = null;
+            if (mediaSource.readyState === 'open') {
+                _onMediaSourceOpen();
+            } else {
+                mediaSource.addEventListener('sourceopen', _onMediaSourceOpen, false);
+                mediaSource.addEventListener('webkitsourceopen', _onMediaSourceOpen, false);
+                logger.debug('MediaSource pre-opened, waiting on sourceopen...');
+            }
         } else {
             if (inputParameters.keepBuffers) {
                 _activateStream(inputParameters);
@@ -1698,6 +1724,11 @@ function StreamController() {
         manifestLoader.reset();
         timelineConverter.reset();
         initCache.reset();
+
+        if (mediaSourcePreOpenUrl) {
+            window.URL.revokeObjectURL(mediaSourcePreOpenUrl);
+            mediaSourcePreOpenUrl = null;
+        }
 
         if (mediaSource) {
             mediaSourceController.detachMediaSource(videoModel);
