@@ -30,19 +30,15 @@
  */
 import FactoryMaker from '../../core/FactoryMaker.js';
 import Debug from '../../core/Debug.js';
-import EventBus from '../../core/EventBus.js';
-import MediaPlayerEvents from '../MediaPlayerEvents.js';
 
 function MediaSourceController() {
 
     let instance,
         mediaSource,
         settings,
-        mediaSourceType,
         logger;
 
     const context = this.context;
-    const eventBus = EventBus(context).getInstance();
 
     function setup() {
         logger = Debug(context).getInstance().getLogger(instance);
@@ -52,15 +48,12 @@ function MediaSourceController() {
 
         let hasWebKit = ('WebKitMediaSource' in window);
         let hasMediaSource = ('MediaSource' in window);
-        let hasManagedMediaSource = ('ManagedMediaSource' in window);
 
-        if (hasManagedMediaSource) {
-            mediaSource = new ManagedMediaSource();
-            mediaSourceType = 'managedMediaSource';
-            logger.info(`Created ManagedMediaSource`)
-        } else if (hasMediaSource) {
+        // ManagedMediaSource (Apple AirPlay/handoff API) is intentionally skipped:
+        // HbbTV devices may expose it but fire sourceopen with multi-second delays,
+        // causing 20+ second startup stalls. Regular MediaSource is reliable on HbbTV.
+        if (hasMediaSource) {
             mediaSource = new MediaSource();
-            mediaSourceType = 'mediaSource';
             logger.info(`Created MediaSource`)
         } else if (hasWebKit) {
             mediaSource = new WebKitMediaSource();
@@ -75,16 +68,6 @@ function MediaSourceController() {
         let objectURL = window.URL.createObjectURL(mediaSource);
 
         videoModel.setSource(objectURL);
-
-        if (mediaSourceType === 'managedMediaSource') {
-            videoModel.setDisableRemotePlayback(true);
-            mediaSource.addEventListener('startstreaming', () => {
-                eventBus.trigger(MediaPlayerEvents.MANAGED_MEDIA_SOURCE_START_STREAMING)
-            })
-            mediaSource.addEventListener('endstreaming', () => {
-                eventBus.trigger(MediaPlayerEvents.MANAGED_MEDIA_SOURCE_END_STREAMING)
-            })
-        }
 
         return objectURL;
     }

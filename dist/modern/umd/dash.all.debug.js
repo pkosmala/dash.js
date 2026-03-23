@@ -58732,8 +58732,6 @@ _core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_3__["default"].updateSingletonFac
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/FactoryMaker.js */ "./src/core/FactoryMaker.js");
 /* harmony import */ var _core_Debug_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/Debug.js */ "./src/core/Debug.js");
-/* harmony import */ var _core_EventBus_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/EventBus.js */ "./src/core/EventBus.js");
-/* harmony import */ var _MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../MediaPlayerEvents.js */ "./src/streaming/MediaPlayerEvents.js");
 /**
  * The copyright in this software is being made available under the BSD License,
  * included below. This software may be subject to other third party and contributor
@@ -58766,26 +58764,21 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 
-
-
 function MediaSourceController() {
-  let instance, mediaSource, settings, mediaSourceType, logger;
+  let instance, mediaSource, settings, logger;
   const context = this.context;
-  const eventBus = (0,_core_EventBus_js__WEBPACK_IMPORTED_MODULE_2__["default"])(context).getInstance();
   function setup() {
     logger = (0,_core_Debug_js__WEBPACK_IMPORTED_MODULE_1__["default"])(context).getInstance().getLogger(instance);
   }
   function createMediaSource() {
     let hasWebKit = 'WebKitMediaSource' in window;
     let hasMediaSource = 'MediaSource' in window;
-    let hasManagedMediaSource = 'ManagedMediaSource' in window;
-    if (hasManagedMediaSource) {
-      mediaSource = new ManagedMediaSource();
-      mediaSourceType = 'managedMediaSource';
-      logger.info(`Created ManagedMediaSource`);
-    } else if (hasMediaSource) {
+
+    // ManagedMediaSource (Apple AirPlay/handoff API) is intentionally skipped:
+    // HbbTV devices may expose it but fire sourceopen with multi-second delays,
+    // causing 20+ second startup stalls. Regular MediaSource is reliable on HbbTV.
+    if (hasMediaSource) {
       mediaSource = new MediaSource();
-      mediaSourceType = 'mediaSource';
       logger.info(`Created MediaSource`);
     } else if (hasWebKit) {
       mediaSource = new WebKitMediaSource();
@@ -58796,15 +58789,6 @@ function MediaSourceController() {
   function attachMediaSource(videoModel) {
     let objectURL = window.URL.createObjectURL(mediaSource);
     videoModel.setSource(objectURL);
-    if (mediaSourceType === 'managedMediaSource') {
-      videoModel.setDisableRemotePlayback(true);
-      mediaSource.addEventListener('startstreaming', () => {
-        eventBus.trigger(_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_3__["default"].MANAGED_MEDIA_SOURCE_START_STREAMING);
-      });
-      mediaSource.addEventListener('endstreaming', () => {
-        eventBus.trigger(_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_3__["default"].MANAGED_MEDIA_SOURCE_END_STREAMING);
-      });
-    }
     return objectURL;
   }
   function detachMediaSource(videoModel) {
