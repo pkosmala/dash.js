@@ -159,6 +159,8 @@ function RepresentationController(config) {
             const hasInitialization = currentRep.hasInitialization();
             const hasSegments = currentRep.hasSegments();
 
+            console.log(`[RepresentationController][TIMING] ${type} rep=${currentRep.id} hasInit=${hasInitialization} hasSegs=${hasSegments} segInfoType=${currentRep.segmentInfoType}: t=${Date.now()}ms`);
+
             // If representation has initialization and segments information we are done
             // otherwise, it means that a request has to be made to get initialization and/or segments information
             const promises = [];
