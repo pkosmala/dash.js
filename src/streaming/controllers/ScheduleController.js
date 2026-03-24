@@ -142,6 +142,7 @@ function ScheduleController(config) {
         const hasTriggeredManualQualitySwitch = abrController.handlePendingManualQualitySwitch(streamInfo.id, type);
 
         if (hasTriggeredManualQualitySwitch) {
+            console.log(`[ScheduleController][TIMING] ${type} hasTriggeredManualQualitySwitch, returning: t=${Date.now()}ms`);
             return
         }
 
@@ -153,6 +154,8 @@ function ScheduleController(config) {
         }
         if (!qualityChange) {
             _getNextFragment();
+        } else {
+            console.log(`[ScheduleController][TIMING] ${type} qualityChange=true, NOT calling _getNextFragment: t=${Date.now()}ms`);
         }
     }
 

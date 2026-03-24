@@ -129,7 +129,9 @@ function SourceBufferSink(config) {
                 return _initializeForText(streamInfo);
             }
 
+            console.log(`[SourceBufferSink][TIMING] addSourceBuffer ${type} codec=${codec}: t=${Date.now()}ms`);
             buffer = mediaSource.addSourceBuffer(codec);
+            console.log(`[SourceBufferSink][TIMING] addSourceBuffer ${type} done: t=${Date.now()}ms`);
 
             _addEventListeners();
 
@@ -141,7 +143,10 @@ function SourceBufferSink(config) {
                 promises.push(updateTimestampOffset(selectedRepresentation.mseTimeOffset));
             }
 
-            return Promise.all(promises);
+            return Promise.all(promises).then((result) => {
+                console.log(`[SourceBufferSink][TIMING] updateAppendWindow+TimestampOffset done for ${type}: t=${Date.now()}ms`);
+                return result;
+            });
 
         } catch (e) {
             // Note that in the following, the quotes are open to allow for extra text after stpp and wvtt

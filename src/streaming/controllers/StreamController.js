@@ -562,14 +562,17 @@ function StreamController() {
      */
     function _activateStream(inputParameters) {
         const representationsFromPreviousPeriod = inputParameters.representationsFromPreviousPeriod || [];
+        console.log(`[StreamController][TIMING] activate() called: t=${Date.now()}ms`);
         activeStream.activate(mediaSource, inputParameters.sourceBufferSinksFromPreviousPeriod, representationsFromPreviousPeriod)
             .then(() => {
+                console.log(`[StreamController][TIMING] activate() resolved, calling startScheduleControllers: t=${Date.now()}ms`);
 
                 // Set the initial time for this stream in the StreamProcessor
                 if (!isNaN(inputParameters.seekTime)) {
                     eventBus.trigger(Events.SEEK_TARGET, { time: inputParameters.seekTime }, { streamId: activeStream.getId() });
                     playbackController.seek(inputParameters.seekTime, false, true);
                     activeStream.startScheduleControllers();
+                    console.log(`[StreamController][TIMING] startScheduleControllers() done: t=${Date.now()}ms`);
                 }
 
                 isStreamSwitchingInProgress = false;

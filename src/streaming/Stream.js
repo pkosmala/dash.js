@@ -298,9 +298,11 @@ function Stream(config) {
 
             Promise.all(promises)
                 .then(() => {
+                    console.log(`[Stream.js][TIMING] selectMediaInfo done, calling _createBufferSinks: t=${Date.now()}ms`);
                     return _createBufferSinks(previousSourceBufferSinks, representationsFromPreviousPeriod)
                 })
                 .then((bufferSinks) => {
+                    console.log(`[Stream.js][TIMING] _createBufferSinks done, calling _initializationCompleted: t=${Date.now()}ms`);
                     if (streamProcessors.length === 0) {
                         const msg = 'No streams to play.';
                         errHandler.error(new DashJSError(Errors.MANIFEST_ERROR_ID_NOSTREAMS_CODE, msg, manifestModel.getValue()));

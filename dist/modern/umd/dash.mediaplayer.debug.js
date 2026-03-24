@@ -49678,14 +49678,19 @@ function SourceBufferSink(config) {
       if (codec.match(/application\/mp4;\s*codecs="(stpp|wvtt).*"/i)) {
         return _initializeForText(streamInfo);
       }
+      console.log(`[SourceBufferSink][TIMING] addSourceBuffer ${type} codec=${codec}: t=${Date.now()}ms`);
       buffer = mediaSource.addSourceBuffer(codec);
+      console.log(`[SourceBufferSink][TIMING] addSourceBuffer ${type} done: t=${Date.now()}ms`);
       _addEventListeners();
       const promises = [];
       promises.push(updateAppendWindow(mediaInfo.streamInfo));
       if (selectedRepresentation && selectedRepresentation.mseTimeOffset !== undefined) {
         promises.push(updateTimestampOffset(selectedRepresentation.mseTimeOffset));
       }
-      return Promise.all(promises);
+      return Promise.all(promises).then(result => {
+        console.log(`[SourceBufferSink][TIMING] updateAppendWindow+TimestampOffset done for ${type}: t=${Date.now()}ms`);
+        return result;
+      });
     } catch (e) {
       // Note that in the following, the quotes are open to allow for extra text after stpp and wvtt
       if (mediaInfo.type == _constants_Constants_js__WEBPACK_IMPORTED_MODULE_5__["default"].TEXT && !mediaInfo.isFragmented || codec.indexOf('codecs="stpp') !== -1 || codec.indexOf('codecs="vtt') !== -1 || codec.indexOf('text/vtt') !== -1) {
@@ -50313,8 +50318,10 @@ function Stream(config) {
         }
       });
       Promise.all(promises).then(() => {
+        console.log(`[Stream.js][TIMING] selectMediaInfo done, calling _createBufferSinks: t=${Date.now()}ms`);
         return _createBufferSinks(previousSourceBufferSinks, representationsFromPreviousPeriod);
       }).then(bufferSinks => {
+        console.log(`[Stream.js][TIMING] _createBufferSinks done, calling _initializationCompleted: t=${Date.now()}ms`);
         if (streamProcessors.length === 0) {
           const msg = 'No streams to play.';
           errHandler.error(new _vo_DashJSError_js__WEBPACK_IMPORTED_MODULE_4__["default"](_core_errors_Errors_js__WEBPACK_IMPORTED_MODULE_6__["default"].MANIFEST_ERROR_ID_NOSTREAMS_CODE, msg, manifestModel.getValue()));
@@ -54877,11 +54884,15 @@ function BufferController(config) {
     return _defaultQualitySwitchPreparation(newRepresentation, oldRepresentation);
   }
   function _defaultQualitySwitchPreparation(newRepresentation, oldRepresentation) {
+    console.log(`[BufferController][TIMING] ${type} _defaultQualitySwitchPreparation start: t=${Date.now()}ms`);
     const promises = [];
     promises.push(updateBufferTimestampOffset(newRepresentation));
     promises.push(abort());
     promises.push(_changeCodec(newRepresentation, oldRepresentation));
-    return Promise.allSettled(promises);
+    return Promise.allSettled(promises).then(result => {
+      console.log(`[BufferController][TIMING] ${type} _defaultQualitySwitchPreparation done: t=${Date.now()}ms`);
+      return result;
+    });
   }
   function prepareForReplacementTrackSwitch(newRepresentation, oldRepresentation) {
     return new Promise(resolve => {
@@ -59700,6 +59711,7 @@ function ScheduleController(config) {
   function _scheduleNextRequest() {
     const hasTriggeredManualQualitySwitch = abrController.handlePendingManualQualitySwitch(streamInfo.id, type);
     if (hasTriggeredManualQualitySwitch) {
+      console.log(`[ScheduleController][TIMING] ${type} hasTriggeredManualQualitySwitch, returning: t=${Date.now()}ms`);
       return;
     }
     let qualityChange = false;
@@ -59710,6 +59722,8 @@ function ScheduleController(config) {
     }
     if (!qualityChange) {
       _getNextFragment();
+    } else {
+      console.log(`[ScheduleController][TIMING] ${type} qualityChange=true, NOT calling _getNextFragment: t=${Date.now()}ms`);
     }
   }
 
@@ -60564,7 +60578,10 @@ function StreamController() {
    */
   function _activateStream(inputParameters) {
     const representationsFromPreviousPeriod = inputParameters.representationsFromPreviousPeriod || [];
+    console.log(`[StreamController][TIMING] activate() called: t=${Date.now()}ms`);
     activeStream.activate(mediaSource, inputParameters.sourceBufferSinksFromPreviousPeriod, representationsFromPreviousPeriod).then(() => {
+      console.log(`[StreamController][TIMING] activate() resolved, calling startScheduleControllers: t=${Date.now()}ms`);
+
       // Set the initial time for this stream in the StreamProcessor
       if (!isNaN(inputParameters.seekTime)) {
         eventBus.trigger(_core_events_Events_js__WEBPACK_IMPORTED_MODULE_5__["default"].SEEK_TARGET, {
@@ -60574,6 +60591,7 @@ function StreamController() {
         });
         playbackController.seek(inputParameters.seekTime, false, true);
         activeStream.startScheduleControllers();
+        console.log(`[StreamController][TIMING] startScheduleControllers() done: t=${Date.now()}ms`);
       }
       isStreamSwitchingInProgress = false;
       eventBus.trigger(_core_events_Events_js__WEBPACK_IMPORTED_MODULE_5__["default"].PERIOD_SWITCH_COMPLETED, {
