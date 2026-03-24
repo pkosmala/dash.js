@@ -130,7 +130,8 @@ function RepresentationController(config) {
             const promises = [];
             for (let i = 0, ln = voAvailableRepresentations.length; i < ln; i++) {
                 const currentRep = voAvailableRepresentations[i];
-                promises.push(_updateRepresentation(currentRep));
+                const isSelected = currentRep.id === selectedRepresentationId;
+                promises.push(_updateRepresentation(currentRep, isSelected));
             }
 
             Promise.all(promises)
@@ -154,19 +155,21 @@ function RepresentationController(config) {
         _endDataUpdate();
     }
 
-    function _updateRepresentation(currentRep) {
+    function _updateRepresentation(currentRep, isSelected = true) {
         return new Promise((resolve, reject) => {
             const hasInitialization = currentRep.hasInitialization();
             const hasSegments = currentRep.hasSegments();
 
-            console.log(`[RepresentationController][TIMING] ${type} rep=${currentRep.id} hasInit=${hasInitialization} hasSegs=${hasSegments} segInfoType=${currentRep.segmentInfoType}: t=${Date.now()}ms`);
+            console.log(`[RepresentationController][TIMING] ${type} rep=${currentRep.id} hasInit=${hasInitialization} hasSegs=${hasSegments} segInfoType=${currentRep.segmentInfoType} isSelected=${isSelected}: t=${Date.now()}ms`);
 
             // If representation has initialization and segments information we are done
             // otherwise, it means that a request has to be made to get initialization and/or segments information
             const promises = [];
 
             promises.push(segmentsController.updateInitData(currentRep, hasInitialization));
-            promises.push(segmentsController.updateSegmentData(currentRep, hasSegments));
+            // For SegmentBase streams, only fetch segment data for the selected representation at startup.
+            // Non-selected representations will have their segments fetched lazily on quality switch.
+            promises.push(segmentsController.updateSegmentData(currentRep, isSelected ? hasSegments : true));
 
             Promise.all(promises)
                 .then((data) => {
@@ -307,6 +310,7 @@ function RepresentationController(config) {
      * We get the new selected Representation which will not hold the ranges and the segment references in case of SegmentBase.
      * In any case use the id to find the right Representation instance in our array of Representations.
      * @param newRep
+     * @return {Promise}
      */
     function prepareQualityChange(newRep) {
         const voRepresentations = voAvailableRepresentations.filter((rep) => {
@@ -314,8 +318,15 @@ function RepresentationController(config) {
         })
 
         if (voRepresentations.length > 0) {
-            _setCurrentVoRepresentation(voRepresentations[0]);
+            const rep = voRepresentations[0];
+            _setCurrentVoRepresentation(rep);
+
+            // If segment data was not fetched at startup (lazy loading for SegmentBase), fetch it now
+            if (!rep.hasSegments()) {
+                return _updateRepresentation(rep, true);
+            }
         }
+        return Promise.resolve();
     }
 
     function _setCurrentVoRepresentation(value) {
