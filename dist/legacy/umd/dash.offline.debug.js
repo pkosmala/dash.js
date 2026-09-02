@@ -47202,17 +47202,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_error_cause_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.error.cause.js */ "./node_modules/core-js/modules/es.error.cause.js");
-/* harmony import */ var core_js_modules_es_array_filter_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.array.filter.js */ "./node_modules/core-js/modules/es.array.filter.js");
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es.array.iterator.js */ "./node_modules/core-js/modules/es.array.iterator.js");
-/* harmony import */ var core_js_modules_es_array_push_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/es.array.push.js */ "./node_modules/core-js/modules/es.array.push.js");
-/* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/es.object.to-string.js */ "./node_modules/core-js/modules/es.object.to-string.js");
-/* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.promise.js */ "./node_modules/core-js/modules/es.promise.js");
-/* harmony import */ var core_js_modules_es_string_iterator_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! core-js/modules/es.string.iterator.js */ "./node_modules/core-js/modules/es.string.iterator.js");
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! core-js/modules/web.dom-collections.iterator.js */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-/* harmony import */ var _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../streaming/constants/Constants.js */ "./src/streaming/constants/Constants.js");
-/* harmony import */ var _core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../core/FactoryMaker.js */ "./src/core/FactoryMaker.js");
-/* harmony import */ var _streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../streaming/MediaPlayerEvents.js */ "./src/streaming/MediaPlayerEvents.js");
-/* harmony import */ var _utils_SegmentsUtils_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../utils/SegmentsUtils.js */ "./src/dash/utils/SegmentsUtils.js");
+/* harmony import */ var core_js_modules_es_array_concat_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.array.concat.js */ "./node_modules/core-js/modules/es.array.concat.js");
+/* harmony import */ var core_js_modules_es_array_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es.array.filter.js */ "./node_modules/core-js/modules/es.array.filter.js");
+/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/es.array.iterator.js */ "./node_modules/core-js/modules/es.array.iterator.js");
+/* harmony import */ var core_js_modules_es_array_push_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/es.array.push.js */ "./node_modules/core-js/modules/es.array.push.js");
+/* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.object.to-string.js */ "./node_modules/core-js/modules/es.object.to-string.js");
+/* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! core-js/modules/es.promise.js */ "./node_modules/core-js/modules/es.promise.js");
+/* harmony import */ var core_js_modules_es_string_iterator_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! core-js/modules/es.string.iterator.js */ "./node_modules/core-js/modules/es.string.iterator.js");
+/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! core-js/modules/web.dom-collections.iterator.js */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+/* harmony import */ var _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../streaming/constants/Constants.js */ "./src/streaming/constants/Constants.js");
+/* harmony import */ var _core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/FactoryMaker.js */ "./src/core/FactoryMaker.js");
+/* harmony import */ var _streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../streaming/MediaPlayerEvents.js */ "./src/streaming/MediaPlayerEvents.js");
+/* harmony import */ var _utils_SegmentsUtils_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../utils/SegmentsUtils.js */ "./src/dash/utils/SegmentsUtils.js");
+
 
 
 
@@ -47270,7 +47272,7 @@ function RepresentationController(config) {
   var instance, voAvailableRepresentations, currentVoRepresentation;
   function setup() {
     resetInitialSettings();
-    eventBus.on(_streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_10__["default"].MANIFEST_VALIDITY_CHANGED, onManifestValidityChanged, instance);
+    eventBus.on(_streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_11__["default"].MANIFEST_VALIDITY_CHANGED, onManifestValidityChanged, instance);
   }
   function getStreamId() {
     return streamInfo.id;
@@ -47280,7 +47282,7 @@ function RepresentationController(config) {
   }
   function checkConfig() {
     if (!abrController || !dashMetrics || !playbackController || !timelineConverter) {
-      throw new Error(_streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_8__["default"].MISSING_CONFIG_ERROR);
+      throw new Error(_streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_9__["default"].MISSING_CONFIG_ERROR);
     }
   }
   function getCurrentRepresentation() {
@@ -47319,7 +47321,7 @@ function RepresentationController(config) {
     voAvailableRepresentations = [];
   }
   function reset() {
-    eventBus.off(_streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_10__["default"].MANIFEST_VALIDITY_CHANGED, onManifestValidityChanged, instance);
+    eventBus.off(_streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_11__["default"].MANIFEST_VALIDITY_CHANGED, onManifestValidityChanged, instance);
     resetInitialSettings();
   }
   function updateData(availableRepresentations, isFragmented, selectedRepresentationId) {
@@ -47327,7 +47329,7 @@ function RepresentationController(config) {
       voAvailableRepresentations = availableRepresentations;
       var selectedRepresentation = getRepresentationById(selectedRepresentationId);
       _setCurrentVoRepresentation(selectedRepresentation);
-      if (type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_8__["default"].VIDEO && type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_8__["default"].ENHANCEMENT && type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_8__["default"].AUDIO && (type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_8__["default"].TEXT || !isFragmented)) {
+      if (type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_9__["default"].VIDEO && type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_9__["default"].ENHANCEMENT && type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_9__["default"].AUDIO && (type !== _streaming_constants_Constants_js__WEBPACK_IMPORTED_MODULE_9__["default"].TEXT || !isFragmented)) {
         _endDataUpdate();
         resolve();
         return;
@@ -47359,6 +47361,7 @@ function RepresentationController(config) {
     return new Promise(function (resolve, reject) {
       var hasInitialization = currentRep.hasInitialization();
       var hasSegments = currentRep.hasSegments();
+      console.log("[RepresentationController][TIMING] ".concat(type, " rep=").concat(currentRep.id, " hasInit=").concat(hasInitialization, " hasSegs=").concat(hasSegments, " segInfoType=").concat(currentRep.segmentInfoType, ": t=").concat(Date.now(), "ms"));
 
       // If representation has initialization and segments information we are done
       // otherwise, it means that a request has to be made to get initialization and/or segments information
@@ -47400,7 +47403,7 @@ function RepresentationController(config) {
     var i, len, s, seg;
     for (i = 0, len = fragments ? fragments.length : 0; i < len; i++) {
       s = fragments[i];
-      seg = (0,_utils_SegmentsUtils_js__WEBPACK_IMPORTED_MODULE_11__.getTimeBasedSegment)({
+      seg = (0,_utils_SegmentsUtils_js__WEBPACK_IMPORTED_MODULE_12__.getTimeBasedSegment)({
         durationInTimescale: s.duration,
         fTimescale: s.timescale,
         index: count,
@@ -47429,7 +47432,7 @@ function RepresentationController(config) {
     if (currentRepresentation) {
       dashMetrics.addRepresentationSwitch(currentRepresentation.adaptation.type, now, currentVideoTimeMs, currentRepresentation.id);
     }
-    eventBus.trigger(_streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_10__["default"].REPRESENTATION_SWITCH, {
+    eventBus.trigger(_streaming_MediaPlayerEvents_js__WEBPACK_IMPORTED_MODULE_11__["default"].REPRESENTATION_SWITCH, {
       mediaType: type,
       streamId: streamInfo.id,
       currentRepresentation: currentRepresentation
@@ -47519,7 +47522,7 @@ function RepresentationController(config) {
   return instance;
 }
 RepresentationController.__dashjs_factory_name = 'RepresentationController';
-/* harmony default export */ __webpack_exports__["default"] = (_core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_9__["default"].getClassFactory(RepresentationController));
+/* harmony default export */ __webpack_exports__["default"] = (_core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_10__["default"].getClassFactory(RepresentationController));
 
 /***/ }),
 
