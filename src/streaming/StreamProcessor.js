@@ -717,13 +717,13 @@ function StreamProcessor(config) {
             _selectMediaInfoForEnhancementStreamProcessor(selectedValues);
 
             // Update Representation Controller with the new data. Note we do not filter any Representations here as the filter values might change over time.
-            console.log(`[StreamProcessor][TIMING] ${type} getPossibleVoRepresentations START: t=${Date.now()}ms`);
+            console.log(`[SP] ${type} getPossibleVoRepresentations START: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
             const voRepresentations = abrController.getPossibleVoRepresentations(currentMediaInfo, false);
-            console.log(`[StreamProcessor][TIMING] ${type} getPossibleVoRepresentations END count=${voRepresentations && voRepresentations.length}: t=${Date.now()}ms`);
-            console.log(`[StreamProcessor][TIMING] ${type} representationController.updateData START: t=${Date.now()}ms`);
+            console.log(`[SP] ${type} getPossibleVoRepresentations END count=${voRepresentations && voRepresentations.length}: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
+            console.log(`[SP] ${type} representationController.updateData START: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
             return representationController.updateData(voRepresentations, currentMediaInfo.isFragmented, selectedValues.selectedRepresentation.id)
                 .then(() => {
-                    console.log(`[StreamProcessor][TIMING] ${type} representationController.updateData END: t=${Date.now()}ms`);
+                    console.log(`[SP] ${type} representationController.updateData END: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
                     _onDataUpdateCompleted()
                     resolve();
                 })
@@ -767,9 +767,9 @@ function StreamProcessor(config) {
             bitrateInKbit = abrController.getInitialBitrateFor(type);
         }
 
-        console.log(`[StreamProcessor][TIMING] ${type} getOptimalRepresentationForBitrate START: t=${Date.now()}ms`);
+        console.log(`[SP] ${type} getOptimalRepresentationForBitrate START: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
         const selectedRepresentation = abrController.getOptimalRepresentationForBitrate(selectionInput.newMediaInfo, bitrateInKbit, false);
-        console.log(`[StreamProcessor][TIMING] ${type} getOptimalRepresentationForBitrate END rep=${selectedRepresentation && selectedRepresentation.id}: t=${Date.now()}ms`);
+        console.log(`[SP] ${type} getOptimalRepresentationForBitrate END rep=${selectedRepresentation && selectedRepresentation.id}: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
         return {
             selectedRepresentation,
             currentMediaInfo: selectionInput.newMediaInfo

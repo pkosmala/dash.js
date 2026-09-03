@@ -549,14 +549,14 @@ function BufferController(config) {
     }
 
     function _defaultQualitySwitchPreparation(newRepresentation, oldRepresentation) {
-        console.log(`[BufferController][TIMING] ${type} _defaultQualitySwitchPreparation start: t=${Date.now()}ms`);
+        console.log(`[BC] ${type} _defaultQualitySwitchPreparation start: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
         const promises = [];
         promises.push(updateBufferTimestampOffset(newRepresentation));
         promises.push(abort());
         promises.push(_changeCodec(newRepresentation, oldRepresentation));
 
         return Promise.allSettled(promises).then((result) => {
-            console.log(`[BufferController][TIMING] ${type} _defaultQualitySwitchPreparation done: t=${Date.now()}ms`);
+            console.log(`[BC] ${type} _defaultQualitySwitchPreparation done: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
             return result;
         });
     }

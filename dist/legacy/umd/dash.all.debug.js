@@ -60020,7 +60020,7 @@ function RepresentationController(config) {
     return new Promise(function (resolve, reject) {
       var hasInitialization = currentRep.hasInitialization();
       var hasSegments = currentRep.hasSegments();
-      console.log("[RepresentationController][TIMING] ".concat(type, " rep=").concat(currentRep.id, " hasInit=").concat(hasInitialization, " hasSegs=").concat(hasSegments, " segInfoType=").concat(currentRep.segmentInfoType, ": t=").concat(Date.now(), "ms"));
+      console.log("[RC] ".concat(type, " rep=").concat(currentRep.id, " hasInit=").concat(hasInitialization, " hasSegs=").concat(hasSegments, " segInfoType=").concat(currentRep.segmentInfoType, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
 
       // If representation has initialization and segments information we are done
       // otherwise, it means that a request has to be made to get initialization and/or segments information
@@ -72910,10 +72910,10 @@ function Stream(config) {
         }
       });
       Promise.all(promises).then(function () {
-        console.log("[Stream.js][TIMING] selectMediaInfo done, calling _createBufferSinks: t=".concat(Date.now(), "ms"));
+        console.log("[ST] selectMediaInfo done, calling _createBufferSinks: +".concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
         return _createBufferSinks(previousSourceBufferSinks);
       }).then(function (bufferSinks) {
-        console.log("[Stream.js][TIMING] _createBufferSinks done: t=".concat(Date.now(), "ms"));
+        console.log("[ST] _createBufferSinks done: +".concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
         if (streamProcessors.length === 0) {
           var msg = 'No streams to play.';
           errHandler.error(new _vo_DashJSError_js__WEBPACK_IMPORTED_MODULE_26__["default"](_core_errors_Errors_js__WEBPACK_IMPORTED_MODULE_24__["default"].MANIFEST_ERROR_ID_NOSTREAMS_CODE, msg, manifestModel.getValue()));
@@ -74334,12 +74334,12 @@ function StreamProcessor(config) {
       _selectMediaInfoForEnhancementStreamProcessor(selectedValues);
 
       // Update Representation Controller with the new data. Note we do not filter any Representations here as the filter values might change over time.
-      console.log("[StreamProcessor][TIMING] ".concat(type, " getPossibleVoRepresentations START: t=").concat(Date.now(), "ms"));
+      console.log("[SP] ".concat(type, " getPossibleVoRepresentations START: +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
       var voRepresentations = abrController.getPossibleVoRepresentations(currentMediaInfo, false);
-      console.log("[StreamProcessor][TIMING] ".concat(type, " getPossibleVoRepresentations END count=").concat(voRepresentations && voRepresentations.length, ": t=").concat(Date.now(), "ms"));
-      console.log("[StreamProcessor][TIMING] ".concat(type, " representationController.updateData START: t=").concat(Date.now(), "ms"));
+      console.log("[SP] ".concat(type, " getPossibleVoRepresentations END count=").concat(voRepresentations && voRepresentations.length, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
+      console.log("[SP] ".concat(type, " representationController.updateData START: +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
       return representationController.updateData(voRepresentations, currentMediaInfo.isFragmented, selectedValues.selectedRepresentation.id).then(function () {
-        console.log("[StreamProcessor][TIMING] ".concat(type, " representationController.updateData END: t=").concat(Date.now(), "ms"));
+        console.log("[SP] ".concat(type, " representationController.updateData END: +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
         _onDataUpdateCompleted();
         resolve();
       }).catch(function (e) {
@@ -74377,9 +74377,9 @@ function StreamProcessor(config) {
     } else {
       bitrateInKbit = abrController.getInitialBitrateFor(type);
     }
-    console.log("[StreamProcessor][TIMING] ".concat(type, " getOptimalRepresentationForBitrate START: t=").concat(Date.now(), "ms"));
+    console.log("[SP] ".concat(type, " getOptimalRepresentationForBitrate START: +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
     var selectedRepresentation = abrController.getOptimalRepresentationForBitrate(selectionInput.newMediaInfo, bitrateInKbit, false);
-    console.log("[StreamProcessor][TIMING] ".concat(type, " getOptimalRepresentationForBitrate END rep=").concat(selectedRepresentation && selectedRepresentation.id, ": t=").concat(Date.now(), "ms"));
+    console.log("[SP] ".concat(type, " getOptimalRepresentationForBitrate END rep=").concat(selectedRepresentation && selectedRepresentation.id, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
     return {
       selectedRepresentation: selectedRepresentation,
       currentMediaInfo: selectionInput.newMediaInfo
@@ -77546,13 +77546,13 @@ function BufferController(config) {
     return _defaultQualitySwitchPreparation(newRepresentation, oldRepresentation);
   }
   function _defaultQualitySwitchPreparation(newRepresentation, oldRepresentation) {
-    console.log("[BufferController][TIMING] ".concat(type, " _defaultQualitySwitchPreparation start: t=").concat(Date.now(), "ms"));
+    console.log("[BC] ".concat(type, " _defaultQualitySwitchPreparation start: +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
     var promises = [];
     promises.push(updateBufferTimestampOffset(newRepresentation));
     promises.push(abort());
     promises.push(_changeCodec(newRepresentation, oldRepresentation));
     return Promise.allSettled(promises).then(function (result) {
-      console.log("[BufferController][TIMING] ".concat(type, " _defaultQualitySwitchPreparation done: t=").concat(Date.now(), "ms"));
+      console.log("[BC] ".concat(type, " _defaultQualitySwitchPreparation done: +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
       return result;
     });
   }
@@ -83369,9 +83369,9 @@ function StreamController() {
    */
   function _activateStream(inputParameters) {
     var representationsFromPreviousPeriod = inputParameters.representationsFromPreviousPeriod || [];
-    console.log("[StreamController][TIMING] activate() called: t=".concat(Date.now(), "ms"));
+    console.log("[SC] activate() called: +".concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
     activeStream.activate(mediaSource, inputParameters.sourceBufferSinksFromPreviousPeriod, representationsFromPreviousPeriod).then(function () {
-      console.log("[StreamController][TIMING] activate() resolved: t=".concat(Date.now(), "ms"));
+      console.log("[SC] activate() resolved: +".concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
 
       // Set the initial time for this stream in the StreamProcessor
       if (!isNaN(inputParameters.seekTime)) {

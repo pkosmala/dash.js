@@ -47361,7 +47361,7 @@ function RepresentationController(config) {
     return new Promise(function (resolve, reject) {
       var hasInitialization = currentRep.hasInitialization();
       var hasSegments = currentRep.hasSegments();
-      console.log("[RepresentationController][TIMING] ".concat(type, " rep=").concat(currentRep.id, " hasInit=").concat(hasInitialization, " hasSegs=").concat(hasSegments, " segInfoType=").concat(currentRep.segmentInfoType, ": t=").concat(Date.now(), "ms"));
+      console.log("[RC] ".concat(type, " rep=").concat(currentRep.id, " hasInit=").concat(hasInitialization, " hasSegs=").concat(hasSegments, " segInfoType=").concat(currentRep.segmentInfoType, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
 
       // If representation has initialization and segments information we are done
       // otherwise, it means that a request has to be made to get initialization and/or segments information

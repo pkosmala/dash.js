@@ -294,11 +294,11 @@ function Stream(config) {
 
             Promise.all(promises)
                 .then(() => {
-                    console.log(`[Stream.js][TIMING] selectMediaInfo done, calling _createBufferSinks: t=${Date.now()}ms`);
+                    console.log(`[ST] selectMediaInfo done, calling _createBufferSinks: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
                     return _createBufferSinks(previousSourceBufferSinks)
                 })
                 .then((bufferSinks) => {
-                    console.log(`[Stream.js][TIMING] _createBufferSinks done: t=${Date.now()}ms`);
+                    console.log(`[ST] _createBufferSinks done: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
                     if (streamProcessors.length === 0) {
                         const msg = 'No streams to play.';
                         errHandler.error(new DashJSError(Errors.MANIFEST_ERROR_ID_NOSTREAMS_CODE, msg, manifestModel.getValue()));
