@@ -836,10 +836,12 @@ function StreamProcessor(config) {
         // Stop scheduling until we are done with preparing the quality switch
         clearScheduleTimer();
 
-        // Update selected Representation in RepresentationController
-        representationController.prepareQualityChange(newRepresentation);
-
-        _handleDifferentSwitchTypes(e);
+        // Update selected Representation in RepresentationController. For SegmentBase this may
+        // first have to resolve the segment list that was skipped at startup.
+        representationController.prepareQualityChange(newRepresentation)
+            .then(() => {
+                _handleDifferentSwitchTypes(e);
+            });
     }
 
     function _prepareAdaptationSwitchQualityChange(e) {
