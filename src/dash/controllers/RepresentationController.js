@@ -203,6 +203,7 @@ function RepresentationController(config) {
             return;
         }
 
+        const _tSegConstruction = Date.now();
         const fragments = e.segments;
         const segments = [];
         let count = 0;
@@ -237,6 +238,8 @@ function RepresentationController(config) {
         if (segments.length > 0) {
             representation.segments = segments;
         }
+
+        console.log(`[SD] ${type} _onSegmentDataUpdated dur=${Date.now() - _tSegConstruction}ms n=${segments.length}: +${Date.now() - ((typeof window !== 'undefined' && window.__DASH_T0__) || 0)}ms`);
 
         return representation;
     }

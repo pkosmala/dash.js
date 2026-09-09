@@ -58445,7 +58445,9 @@ function SegmentBaseLoader() {
       var extraBytes = info.bytesToLoad;
       var loadedLength = response.byteLength;
       info.bytesLoaded = info.range.end - info.range.start;
+      var _tParse = Date.now();
       isoFile = boxParser.parse(response);
+      console.log("[BP] ".concat(mediaType, " boxParser.parse dur=").concat(Date.now() - _tParse, "ms bytes=").concat(response && response.byteLength, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
       sidx = isoFile.getBox('sidx');
       if (!sidx || !sidx.isComplete) {
         if (sidx) {
@@ -58505,7 +58507,9 @@ function SegmentBaseLoader() {
           }
         } else {
           logger.debug('Parsing segments from SIDX. representation ' + mediaType + ' - id: ' + representation.id + ' for range : ' + info.range.start + ' - ' + info.range.end);
+          var _tSidx = Date.now();
           segments = getSegmentsForSidx(sidx, info);
+          console.log("[BP] ".concat(mediaType, " getSegmentsForSidx dur=").concat(Date.now() - _tSidx, "ms n=").concat(segments && segments.length, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
           callback(segments, representation, resolve);
         }
       }
@@ -59946,6 +59950,7 @@ function RepresentationController(config) {
     if (!e || e.error) {
       return;
     }
+    var _tSegConstruction = Date.now();
     var fragments = e.segments;
     var segments = [];
     var count = 0;
@@ -59972,6 +59977,7 @@ function RepresentationController(config) {
     if (segments.length > 0) {
       representation.segments = segments;
     }
+    console.log("[SD] ".concat(type, " _onSegmentDataUpdated dur=").concat(Date.now() - _tSegConstruction, "ms n=").concat(segments.length, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
     return representation;
   }
   function _addRepresentationSwitch(currentRepresentation) {

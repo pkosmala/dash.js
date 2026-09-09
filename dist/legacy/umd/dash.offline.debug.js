@@ -47397,6 +47397,7 @@ function RepresentationController(config) {
     if (!e || e.error) {
       return;
     }
+    var _tSegConstruction = Date.now();
     var fragments = e.segments;
     var segments = [];
     var count = 0;
@@ -47423,6 +47424,7 @@ function RepresentationController(config) {
     if (segments.length > 0) {
       representation.segments = segments;
     }
+    console.log("[SD] ".concat(type, " _onSegmentDataUpdated dur=").concat(Date.now() - _tSegConstruction, "ms n=").concat(segments.length, ": +").concat(Date.now() - (typeof window !== 'undefined' && window.__DASH_T0__ || 0), "ms"));
     return representation;
   }
   function _addRepresentationSwitch(currentRepresentation) {
