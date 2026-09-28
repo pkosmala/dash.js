@@ -58273,7 +58273,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_FactoryMaker_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../core/FactoryMaker.js */ "./src/core/FactoryMaker.js");
 /* harmony import */ var _streaming_vo_FragmentRequest_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../streaming/vo/FragmentRequest.js */ "./src/streaming/vo/FragmentRequest.js");
 /* harmony import */ var _streaming_net_URLLoader_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../streaming/net/URLLoader.js */ "./src/streaming/net/URLLoader.js");
-/* harmony import */ var _vo_FullSegment_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./vo/FullSegment.js */ "./src/dash/vo/FullSegment.js");
 
 
 
@@ -58310,7 +58309,6 @@ __webpack_require__.r(__webpack_exports__);
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-
 
 
 
@@ -58544,19 +58542,27 @@ function SegmentBaseLoader() {
     var time = sidx.earliest_presentation_time;
     var start = info.range.start + sidx.offset + sidx.first_offset + sidx.size;
     var segments = [];
-    var segment, end, duration, size;
+    var end, duration, size;
     for (var i = 0; i < len; i++) {
       duration = refs[i].subsegment_duration;
       size = refs[i].referenced_size;
-      segment = new _vo_FullSegment_js__WEBPACK_IMPORTED_MODULE_10__["default"]();
-      // note that we don't explicitly set segment.media as this will be
-      // computed when all BaseURLs are resolved later
-      segment.duration = duration;
-      segment.startTime = time;
-      segment.timescale = timescale;
       end = start + size - 1;
-      segment.mediaRange = start + '-' + end;
-      segments.push(segment);
+
+      // Plain record rather than a FullSegment. This list is an intermediate: the only
+      // consumers, RepresentationController._onSegmentDataUpdated() and
+      // ThumbnailTracks._normalizeSegments(), read five fields off each entry and then
+      // build the real Segment through getTimeBasedSegment(). Instantiating the class
+      // here cost a fifteen property constructor plus an off-shape startTime write for
+      // every entry, which dominates startup on constrained devices when a manifest has
+      // a long index range.
+      // media stays null, it is resolved once all BaseURLs are known.
+      segments.push({
+        duration: duration,
+        startTime: time,
+        timescale: timescale,
+        mediaRange: start + '-' + end,
+        media: null
+      });
       time += duration;
       start += size;
     }
@@ -58603,8 +58609,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _streaming_vo_FragmentRequest_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../streaming/vo/FragmentRequest.js */ "./src/streaming/vo/FragmentRequest.js");
 /* harmony import */ var _streaming_net_URLLoader_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../streaming/net/URLLoader.js */ "./src/streaming/net/URLLoader.js");
 /* harmony import */ var _streaming_vo_DashJSError_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../streaming/vo/DashJSError.js */ "./src/streaming/vo/DashJSError.js");
-/* harmony import */ var _dash_vo_FullSegment_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../dash/vo/FullSegment.js */ "./src/dash/vo/FullSegment.js");
-
 
 
 
@@ -58738,7 +58742,7 @@ function WebmSegmentBaseLoader() {
     return cues;
   }
   function parseSegments(data, segmentStart, segmentEnd, segmentDuration) {
-    var duration, parsed, segments, segment, i, len, start, end;
+    var duration, parsed, segments, i, len, start, end;
     parsed = parseCues(data);
     segments = [];
 
@@ -58746,27 +58750,29 @@ function WebmSegmentBaseLoader() {
     // both duration and media range require the i + 1 segment
     // the final segment has to use global segment parameters
     for (i = 0, len = parsed.length; i < len; i += 1) {
-      segment = new _dash_vo_FullSegment_js__WEBPACK_IMPORTED_MODULE_10__["default"]();
       duration = 0;
       if (i < parsed.length - 1) {
         duration = parsed[i + 1].CueTime - parsed[i].CueTime;
       } else {
         duration = segmentDuration - parsed[i].CueTime;
       }
-
-      // note that we don't explicitly set segment.media as this will be
-      // computed when all BaseURLs are resolved later
-      segment.duration = duration;
-      segment.startTime = parsed[i].CueTime;
-      segment.timescale = 1000; // hardcoded for ms
       start = parsed[i].CueTracks[0].ClusterPosition + segmentStart;
       if (i < parsed.length - 1) {
         end = parsed[i + 1].CueTracks[0].ClusterPosition + segmentStart - 1;
       } else {
         end = segmentEnd - 1;
       }
-      segment.mediaRange = start + '-' + end;
-      segments.push(segment);
+
+      // Plain record, see the equivalent comment in SegmentBaseLoader.getSegmentsForSidx().
+      // media stays null, it is resolved once all BaseURLs are known.
+      segments.push({
+        duration: duration,
+        startTime: parsed[i].CueTime,
+        timescale: 1000,
+        // hardcoded for ms
+        mediaRange: start + '-' + end,
+        media: null
+      });
     }
     logger.debug('Parsed cues: ' + segments.length + ' cues.');
     return segments;
