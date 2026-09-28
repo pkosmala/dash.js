@@ -64042,20 +64042,29 @@ function _createSinglePartialSegment(data, subNumberOfPartialSegmentToRequest) {
     mediaTimeInSeconds: data.mediaTimeInSeconds + subNumberOfPartialSegmentToRequest * partialSegmentDurationInSeconds,
     index: index
   };
-  var segmentData = _getCommonSegmentData(inputData);
-  partialSegment.assignAttributes(segmentData);
+  _assignCommonSegmentData(partialSegment, inputData);
   partialSegment.replacementSubNumber = subNumberOfPartialSegmentToRequest;
   partialSegment.totalNumberOfPartialSegments = totalNumberOfPartialSegments;
   return partialSegment;
 }
 function _getFullSegment(data) {
   var fullSegment = new _vo_FullSegment_js__WEBPACK_IMPORTED_MODULE_2__["default"]();
-  var segmentData = _getCommonSegmentData(data);
-  fullSegment.assignAttributes(segmentData);
+  _assignCommonSegmentData(fullSegment, data);
   _addTimeBasedInformation(fullSegment, data);
   return fullSegment;
 }
-function _getCommonSegmentData(data) {
+
+/**
+ * Writes the common segment attributes straight onto the segment.
+ *
+ * This used to build an intermediate object literal and copy it across with
+ * Segment.assignAttributes(), a for-in loop with a hasOwnProperty() check on both the source
+ * and the target for every key. Every one of those keys is a declared property of Segment, so
+ * the copy was a no-op reordering of work that costs one extra allocation and a reflective
+ * property walk per segment. Manifests with long SegmentBase index ranges build thousands of
+ * these at startup.
+ */
+function _assignCommonSegmentData(segment, data) {
   var representation = data.representation,
     segmentDurationInSeconds = data.segmentDurationInSeconds,
     presentationStartTime = data.presentationStartTime,
@@ -64064,18 +64073,17 @@ function _getCommonSegmentData(data) {
     timelineConverter = data.timelineConverter,
     isDynamic = data.isDynamic,
     index = data.index;
-  var segmentData = {
-    availabilityEndTime: timelineConverter.calcAvailabilityEndTimeFromPresentationTime(presentationEndTime + segmentDurationInSeconds, representation, isDynamic),
-    availabilityStartTime: timelineConverter.calcAvailabilityStartTimeFromPresentationTime(presentationEndTime, representation, isDynamic),
-    duration: segmentDurationInSeconds,
-    index: index,
-    mediaStartTime: mediaTimeInSeconds,
-    presentationStartTime: presentationStartTime,
-    replacementNumber: representation.startNumber + index,
-    representation: representation
-  };
-  segmentData.wallStartTime = timelineConverter.calcWallTimeForSegment(segmentData, isDynamic);
-  return segmentData;
+  segment.availabilityEndTime = timelineConverter.calcAvailabilityEndTimeFromPresentationTime(presentationEndTime + segmentDurationInSeconds, representation, isDynamic);
+  segment.availabilityStartTime = timelineConverter.calcAvailabilityStartTimeFromPresentationTime(presentationEndTime, representation, isDynamic);
+  segment.duration = segmentDurationInSeconds;
+  segment.index = index;
+  segment.mediaStartTime = mediaTimeInSeconds;
+  segment.presentationStartTime = presentationStartTime;
+  segment.replacementNumber = representation.startNumber + index;
+  segment.representation = representation;
+  // Computed last: it reads presentationStartTime and availabilityStartTime off the segment.
+  segment.wallStartTime = timelineConverter.calcWallTimeForSegment(segment, isDynamic);
+  return segment;
 }
 function _addTimeBasedInformation(segment, data) {
   var tManifest = data.tManifest,
